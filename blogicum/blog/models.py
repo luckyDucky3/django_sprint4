@@ -1,11 +1,21 @@
 # определение моделей Django с возможностью публикации постов, комментариев и их категоризации.
-
 from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from django.contrib import admin
 from django.db import models
 
 # Получаем текущую модель пользователя из настроек проекта
 User = get_user_model()
 
+# Если модель уже зарегистрирована, разрегистрируем её
+if admin.site.is_registered(User):
+    admin.site.unregister(User)
+
+# Регистрируем модель с кастомным UserAdmin
+class CustomUserAdmin(UserAdmin):
+    pass
+
+admin.site.register(User, CustomUserAdmin)
 
 # Абстрактная модель для добавления полей "Опубликовано" и "Дата создания"
 class PublishedCreated(models.Model):
