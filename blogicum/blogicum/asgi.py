@@ -1,5 +1,5 @@
 """
-ASGI config for blogicum project.
+ASGI config for blogicum.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

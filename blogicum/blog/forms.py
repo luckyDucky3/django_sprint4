@@ -1,35 +1,41 @@
+# Формы для авторизации и публикации постов
+
 from django import forms
-from django.utils import timezone
 
-from .models import Comment, Post
+from .models import Post, User, Comment
 
 
-class CreatePostForm(forms.ModelForm):
-    pub_date = forms.DateTimeField(
-        initial=timezone.now,
-        required=True,
-        widget=forms.DateTimeInput(
-            attrs={
-                'type': 'datetime-local',
-            },
-            format='%Y-%m-%dT%H:%M',
-        ),
-    )
+class UserForm(forms.ModelForm):
+    """
+    Форма для создания и редактирования профиля пользователя
+    Поля из модели: first_name, last_name, email, username
+    """
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'username')
+
+
+class PostForm(forms.ModelForm):
+    """
+    Форма для создания и редактирования публикаций
+    Поля: из модели кроме author (он автоматически
+                            задается текущим логином пользователя),
+    Настройка отображения поля pub_date с помощью виджета DateInput
+                            для выбора даты и времени
+    """
 
     class Meta:
         model = Post
-        fields = (
-            'title',
-            'image',
-            'text',
-            'pub_date',
-            'location',
-            'category',
-            'is_published',
-        )
+        exclude = ('author',)
+        widgets = {
+            'pub_date': forms.DateInput(attrs={'type': 'datetime-local'})
+        }
 
 
-class CreateCommentForm(forms.ModelForm):
+class CommentForm(forms.ModelForm):
+    """Форма для добавления комментариев к публикациям с полем text"""
+
     class Meta:
         model = Comment
-        fields = ("text",)
+        fields = ('text',)

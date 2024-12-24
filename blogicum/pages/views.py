@@ -1,19 +1,22 @@
+# Подключение шаблонов кастомных страниц для ошибок с помощью view-классов
+
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
 
-class AboutTemplateView(TemplateView):
+class About(TemplateView):
+    """view-класс для страницы about"""
+
     template_name = 'pages/about.html'
 
 
-class RulesTemplateView(TemplateView):
+class Rules(TemplateView):
+    """view-класс для страницы rules"""
+
     template_name = 'pages/rules.html'
 
 
-def permission_denied(request, exception):
-    return render(request, 'pages/403.html', status=403)
-
-
+# view-функции для ошибок 403csrf, 404, 500
 def csrf_failure(request, reason=''):
     return render(request, 'pages/403csrf.html', status=403)
 

@@ -25,14 +25,14 @@
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                   href="{% url 'blog:profile' user.username %}">{{ user.username }}</a></button>
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'users:logout' %}">Выйти</a></button>
+                  href="{% url 'logout' %}">Выйти</a></button>
             </div>
           {% else %}
             <div class="btn-group" role="group" aria-label="Basic outlined example">
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'users:login' %}">Войти</a></button>
+                  href="{% url 'login' %}">Войти</a></button>
               <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'users:registration' %}">Регистрация</a></button>
+                  href="{% url 'registration' %}">Регистрация</a></button>
             </div>
           {% endif %}
         </ul>
