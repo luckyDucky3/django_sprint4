@@ -1,122 +1,99 @@
+# определение моделей Django с возможностью публикации постов, комментариев и их категоризации.
+
 from django.contrib.auth import get_user_model
 from django.db import models
 
+# Получаем текущую модель пользователя из настроек проекта
 User = get_user_model()
 
 
+# Абстрактная модель для добавления полей "Опубликовано" и "Дата создания"
 class PublishedCreated(models.Model):
-    """
-    Модель для добавления полей отметки о публикации и времени создания
-    Атрибуты:
-            is_published (флаг публикации, позволяет скрывать объекты)
-            created_at (автоматически заполняется при создании объекта датой)
-    """
-
     is_published = models.BooleanField(
         default=True, verbose_name='Опубликовано',
-        help_text='Снимите галочку, чтобы скрыть публикацию.'
+        help_text='Снимите галочку, чтобы скрыть публикацию.'  # Подсказка для админки
     )
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Добавлено'
+        auto_now_add=True, verbose_name='Добавлено'  # Автоматически добавляется при создании
     )
 
     class Meta:
-        abstract = True
+        abstract = True  # Указывает, что это абстрактная модель
 
 
+# Модель "Категория", наследует поля из PublishedCreated
 class Category(PublishedCreated):
-    """
-    Модель категории для публикаций
-    Атрибуты:
-            title (название категории)
-            description (описание категории)
-            slug (идентификатор для формирования URL)
-    """
-
-    title = models.CharField(max_length=256, verbose_name='Заголовок')
-    description = models.TextField(verbose_name='Описание')
+    title = models.CharField(max_length=256, verbose_name='Заголовок')  # Название категории
+    description = models.TextField(verbose_name='Описание')  # Описание категории
     slug = models.SlugField(
         unique=True,
         verbose_name='Идентификатор',
         help_text=('Идентификатор страницы для URL; разрешены '
-                   'символы латиницы, цифры, дефис и подчёркивание.')
+                   'символы латиницы, цифры, дефис и подчёркивание.')  # Подсказка для админки
     )
 
     class Meta:
-        verbose_name = 'категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'категория'  # Отображаемое имя в админке
+        verbose_name_plural = 'Категории'  # Множественное число для админки
 
     def __str__(self):
+        # Возвращает строковое представление объекта
         return (
             f'{self.title[:30]} - {self.description[:30]} - {self.slug}'
         )
 
 
+# Модель "Местоположение", наследует поля из PublishedCreated
 class Location(PublishedCreated):
-    """
-    Модель местоположения для публикаций
-    Атрибуты:
-            name (название местоположения. По умолчанию "Планета Земля")
-    """
-
     name = models.CharField(
-        max_length=256, verbose_name='Название места', default='Планета Земля'
+        max_length=256, verbose_name='Название места', default='Планета Земля'  # Поле с названием места
     )
 
     class Meta:
-        verbose_name = 'местоположение'
-        verbose_name_plural = 'Местоположения'
+        verbose_name = 'местоположение'  # Отображаемое имя в админке
+        verbose_name_plural = 'Местоположения'  # Множественное число для админки
 
     def __str__(self):
+        # Возвращает строковое представление объекта
         return self.name[:30]
 
 
+# Модель "Публикация", наследует поля из PublishedCreated
 class Post(PublishedCreated):
-    """
-    Модель публикации
-    Атрибуты:
-            title (заголовок публикации)
-            text (основной текст публикации)
-            pub_date (дата и время публикации, поддерживает отложенные
-                                                                    публикации)
-            author (связь с пользователем, создавшим публикацию)
-            location (связь с моделью Location)
-            category (связь с моделью Category)
-            image (поле для загрузки изображения)
-    """
-
-    title = models.CharField(max_length=256, verbose_name='Название')
-    text = models.TextField(verbose_name='Текст')
+    title = models.CharField(max_length=256, verbose_name='Название')  # Название публикации
+    text = models.TextField(verbose_name='Текст')  # Содержимое публикации
     pub_date = models.DateTimeField(
         verbose_name='Дата и время публикации',
         help_text=(
             'Если установить дату и время в будущем — '
-            'можно делать отложенные публикации.'
+            'можно делать отложенные публикации.'  # Подсказка для админки
         )
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, verbose_name='Автор публикации',
-        related_name='posts'
+        related_name='posts'  # Связь с пользователем (автор)
     )
     location = models.ForeignKey(
         Location, on_delete=models.SET_NULL,
         null=True, verbose_name='Местоположение',
-        related_name='posts'
+        related_name='posts'  # Связь с местоположением
     )
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL,
         null=True, verbose_name='Категория',
-        related_name='posts'
+        related_name='posts'  # Связь с категорией
     )
-    image = models.ImageField('Изображение', upload_to='post_images',
-                              blank=True)
+    image = models.ImageField(
+        'Изображение', upload_to='post_images', blank=True  # Поле для загрузки изображения
+    )
 
     class Meta:
-        verbose_name = 'публикация'
-        verbose_name_plural = 'Публикации'
-        ordering = ('-pub_date',)
+        verbose_name = 'публикация'  # Отображаемое имя в админке
+        verbose_name_plural = 'Публикации'  # Множественное число для админки
+        ordering = ('-pub_date',)  # Сортировка по убыванию даты публикации
 
     def __str__(self):
+        # Возвращает строковое представление объекта
         return (
             f'{(self.author.get_username())[:30]} - {self.title[:30]} '
             f'{self.text[:50]} - {self.pub_date} '
@@ -124,32 +101,24 @@ class Post(PublishedCreated):
         )
 
 
+# Модель "Комментарий"
 class Comment(models.Model):
-    """
-    Модель комментария для публикаций
-    Атрибуты:
-            text (текст комментария)
-            created_at (дата и время добавления комментария)
-            author (связь с пользователем, создавшим комментарий)
-            post (связь с публикацией, к которой относится комментарий)
-    """
-
-    text = models.TextField('Текст')
+    text = models.TextField('Текст')  # Содержимое комментария
     created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name='Добавлено'
+        auto_now_add=True, verbose_name='Добавлено'  # Автоматически добавляется при создании
     )
     author = models.ForeignKey(
         User, on_delete=models.CASCADE,
         verbose_name='Автор публикации',
-        related_name='comments'
+        related_name='comments'  # Связь с пользователем (автор)
     )
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE,
         verbose_name='Публикация',
-        related_name='comments'
+        related_name='comments'  # Связь с публикацией
     )
 
     class Meta:
-        verbose_name = 'коментарий'
-        verbose_name_plural = 'коментарии'
-        ordering = ('created_at',)
+        verbose_name = 'коментарий'  # Отображаемое имя в админке
+        verbose_name_plural = 'коментарии'  # Множественное число для админки
+        ordering = ('created_at',)  # Сортировка по дате создания (по возрастанию)

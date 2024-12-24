@@ -1,6 +1,9 @@
-from django.contrib import admin
+# настраивает интерфейс администртивной панели Django для работы с моделями
+# Category, Location, Post и Comment. Он добавляет дополнительные возможнос
+# ти отображения, редактирования и фильтрации данных в административной пан
+# ели.
 
-# Register your models here.
+from django.contrib import admin
 from .models import Category, Location, Post, Comment
 
 admin.site.empty_value_display = 'Не задано'
